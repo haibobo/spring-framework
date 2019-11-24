@@ -28,6 +28,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * Spring 实现 AOP 主要类
+ * 通过注解获取切面并生成代理类，通过 {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser}
+ * 注册为 BeanDefinition.
+ * 父类为通过 XML 解析切面，解析时会调用父类方法.
+ * 父类实现了 {@link org.springframework.beans.factory.config.BeanPostProcessor}
+ * 通过 postProcessAfterInitialization() 方法为切面生成代理类
+ */
+
+/**
  * {@link AspectJAwareAdvisorAutoProxyCreator} subclass that processes all AspectJ
  * annotation aspects in the current application context, as well as Spring Advisors.
  *
@@ -88,10 +97,14 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
+
+		// 获取父类所有增强器（通过 XML 配置的切面）
 		// Add all the Spring advisors found according to superclass rules.
 		List<Advisor> advisors = super.findCandidateAdvisors();
 		// Build Advisors for all AspectJ aspects in the bean factory.
 		if (this.aspectJAdvisorsBuilder != null) {
+
+			// 获取增强器（通过注解配置的切面）
 			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		}
 		return advisors;
